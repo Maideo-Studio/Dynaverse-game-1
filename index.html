@@ -134,8 +134,8 @@ class MultiplayerEngine {
     }
 
     initScaledrone() {
-        // Replace 'YOUR_CHANNEL_ID' with your Scaledrone channel ID
-        this.drone = new Scaledrone("YOUR_CHANNEL_ID");
+        // Replace 'NUQmTa8yqYMpijoa' with your Scaledrone channel ID
+        this.drone = new Scaledrone("NUQmTa8yqYMpijoa");
         this.drone.on('open', () => {
             console.log("Connected to Scaledrone");
             this.room = this.drone.subscribe("observable-room");
