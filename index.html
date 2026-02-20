@@ -15,7 +15,7 @@
 class MultiplayerEngine {
     constructor() {
         this.keys = {};
-        this.speed = 0.15;
+        this.speed = 0.2;
         this.rotationSpeed = 0.05;
         this.cameraAngle = 0;
         this.cameraDistance = 8;
@@ -79,6 +79,34 @@ class MultiplayerEngine {
         this.ground.position.y = -1.1;
         this.scene.add(this.ground);
 
+        // Obstacles & boxes
+        const boxGeo = new THREE.BoxGeometry(7, 9, 1);
+        const textureLoader = new THREE.TextureLoader();
+        const texture = textureLoader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/main/6c73f79e-38f2-4f6e-aab7-d66f7f1755de.png");
+        texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+        texture.repeat.set(1, 1);
+        const boxMat = new THREE.MeshStandardMaterial({ map: texture, color: 0xC4A484 });
+        this.customBox = new THREE.Mesh(boxGeo, boxMat);
+        this.customBox.position.set(-15.2, 1, -6);
+        this.scene.add(this.customBox);
+
+        const boxGeo2 = new THREE.BoxGeometry(10, 8, 0.0001);
+        const texture2 = textureLoader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/da678efa-e4a2-4312-9c8d-d73561806de0.png");
+        const boxMat2 = new THREE.MeshStandardMaterial({ map: texture2 });
+        this.secondBox = new THREE.Mesh(boxGeo2, boxMat2);
+        this.secondBox.position.set(5, 3, -10);
+        this.scene.add(this.secondBox);
+
+        const boxGeo3 = new THREE.BoxGeometry(3, 3, 0.001);
+        const texture3 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/4c5ab58e-c8a2-483d-ba77-8d2d212b61ca.png");
+        texture3.wrapS = texture3.wrapT = THREE.RepeatWrapping;
+        texture3.repeat.set(1, 1);
+        texture3.magFilter = THREE.NearestFilter;
+        const boxMat3 = new THREE.MeshStandardMaterial({ map: texture3 });
+        this.thirdBox = new THREE.Mesh(boxGeo3, boxMat3);
+        this.thirdBox.position.set(-10, 1.5, -4.9);
+        this.scene.add(this.thirdBox);
+
         // Player
         this.player = new THREE.Group();
         this.player.position.y = 0.5;
@@ -127,19 +155,18 @@ class MultiplayerEngine {
         this.rightLeg.scale.set(0.2, 0.6, 0.3);
         this.player.add(this.rightLeg);
 
-        // Obstacles
+        // Obstacles (same as original)
         const obstacleTexture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/main/image%20(5).png");
         obstacleTexture.magFilter = THREE.NearestFilter;
         obstacleTexture.wrapS = obstacleTexture.wrapT = THREE.RepeatWrapping;
-        obstacleTexture.repeat.set(0.3, 0.3); // make texture appear bigger
+        obstacleTexture.repeat.set(0.3, 0.3);
 
         const obstacleGeo = new THREE.BoxGeometry(1, 2, 2);
         const obstacleMat = new THREE.MeshStandardMaterial({ map: obstacleTexture });
 
         this.obstacles = [];
-
         const obstaclePositions = [
-            [-6, 0, -10],
+                      [-6, 0, -10],
             [-6, 0, -12],
             [-6, 0, -14],
             [-6, 0, -16],
@@ -441,10 +468,30 @@ class MultiplayerEngine {
                                 [-9 ,2, -18],
                                 [-9 ,4, -18],
                                 [-9 ,6, -18],
-                                [-9 ,8, -18],
-                                                                               
+                                [-9 ,8, -18]
+            // ... truncated for brevity, keep all original positions
         ];
+   const obstacle2Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(6).png");
+        obstacle2Texture.magFilter = THREE.NearestFilter;
+        obstacle2Texture.wrapS = obstacle2Texture.wrapT = THREE.RepeatWrapping;
+        obstacle2Texture.repeat.set(1, 1); // make texture appear bigger
 
+        const obstacle2Geo = new THREE.BoxGeometry(18, 1, 14 );
+        const obstacle2Mat = new THREE.MeshStandardMaterial({ map: obstacle2Texture });
+
+        this.obstacle2s = [];
+
+        const obstacle2Positions = [
+            [-14.5,9.5,-12]
+    ];
+        obstacle2Positions.forEach(pos => {
+    const obstacle = new THREE.Mesh(obstacle2Geo, obstacle2Mat);
+
+    obstacle.position.set(pos[0], pos[1], pos[2]);
+
+    this.scene.add(obstacle);   // or scene.add(obstacle) depending on your setup
+    this.obstacle2s.push(obstacle);
+});
         for (let pos of obstaclePositions) {
             const obs = new THREE.Mesh(obstacleGeo, obstacleMat);
             obs.position.set(pos[0], pos[1], pos[2]);
@@ -455,6 +502,15 @@ class MultiplayerEngine {
         // Boxes for collision
         this.playerBox = new THREE.Box3();
         this.obstacleBoxes = this.obstacles.map(() => new THREE.Box3());
+    }
+
+    // ===== NEW: Shorter Head Hitbox =====
+    updatePlayerHitbox() {
+        const pos = this.player.position;
+        const min = new THREE.Vector3(pos.x - 0.75, pos.y - 1.3, pos.z - 0.25);
+        const max = new THREE.Vector3(pos.x + 0.75, pos.y + 1.0, pos.z + 0.25); // shorter head
+        this.playerBox.min.copy(min);
+        this.playerBox.max.copy(max);
     }
 
     initControls() {
@@ -483,7 +539,6 @@ class MultiplayerEngine {
         const limbMat = new THREE.MeshStandardMaterial({ color: 0xd524b0 });
 
         const group = new THREE.Group();
-
         const head = new THREE.Mesh(geometry, headMat);
         head.scale.set(1.5, 1, 1);
         group.add(head);
@@ -535,7 +590,7 @@ class MultiplayerEngine {
         if (this.keys["d"]) { this.player.position.add(right.clone().multiplyScalar(this.speed)); moved = true; }
 
         // Horizontal collisions
-        this.playerBox.setFromObject(this.player);
+        this.updatePlayerHitbox(); // ✅ use custom shorter hitbox
         this.obstacles.forEach((obs, i) => this.obstacleBoxes[i].setFromObject(obs));
         if (this.obstacleBoxes.some(box => this.playerBox.intersectsBox(box))) {
             this.player.position.copy(oldPosition);
@@ -547,31 +602,36 @@ class MultiplayerEngine {
             this.isJumping = true;
         }
 
-        if (this.isJumping || this.player.position.y > 0.5) {
-            this.player.position.y += this.velocity_y;
-            this.velocity_y += this.gravity;
+        this.player.position.y += this.velocity_y;
+        this.velocity_y += this.gravity;
 
-            this.playerBox.setFromObject(this.player);
-            this.obstacles.forEach((obs, i) => this.obstacleBoxes[i].setFromObject(obs));
+        this.updatePlayerHitbox(); // ✅ update hitbox after vertical movement
+        this.obstacles.forEach((obs, i) => this.obstacleBoxes[i].setFromObject(obs));
 
-            // Landing on obstacles
-            for (let i = 0; i < this.obstacles.length; i++) {
-                let obs = this.obstacles[i];
-                let box = this.obstacleBoxes[i];
-                if (this.playerBox.intersectsBox(box) && this.velocity_y <= 0) {
-                    const obstacleTop = obs.position.y + 1;
-                    this.player.position.y = obstacleTop + 1.65;
-                    this.velocity_y = 0;
-                    this.isJumping = false;
-                }
-            }
-
-            // Floor
-            if (this.player.position.y < 0.5) {
-                this.player.position.y = 0.5;
-                this.isJumping = false;
+        // Landing on obstacles
+        for (let i = 0; i < this.obstacles.length; i++) {
+            let obs = this.obstacles[i];
+            let box = this.obstacleBoxes[i];
+            if (this.playerBox.intersectsBox(box) && this.velocity_y <= 0) {
+                const obstacleTop = obs.position.y + 1;
+                this.player.position.y = obstacleTop + 1.65;
                 this.velocity_y = 0;
+                this.isJumping = false;
             }
+        }
+
+        // Floor
+        const halfSize = 50;
+        const onGroundArea =
+            this.player.position.x > -halfSize &&
+            this.player.position.x < halfSize &&
+            this.player.position.z > -halfSize &&
+            this.player.position.z < halfSize;
+
+        if (onGroundArea && this.player.position.y < 0.5) {
+            this.player.position.y = 0.5;
+            this.isJumping = false;
+            this.velocity_y = 0;
         }
 
         // Player rotation
