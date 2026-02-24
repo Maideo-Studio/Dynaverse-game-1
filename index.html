@@ -6,9 +6,36 @@
     <style>
         body { margin: 0; overflow: hidden; background: #2595f3; }
         canvas { display: block; }
+          body {
+    margin: 0;
+  }
+
+  #flashImage {
+    position: fixed;              /* stays in screen center */
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%); /* true center */
+    width: 200px;
+  }
     </style>
 </head>
 <body>
+
+
+
+
+<img id="flashImage" src="https://cdn.pixabay.com/animation/2024/11/05/01/36/01-36-23-338_512.gif">
+
+<script>
+  // Hide after 0.5 seconds (500 milliseconds)
+  setTimeout(() => {
+    document.getElementById("flashImage").style.display = "none";
+  }, 1000);
+</script>
+
+
+
+
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
 <script>
@@ -16,7 +43,7 @@ class MultiplayerEngine {
     constructor() {
         this.walkSoundPlaying = false;
         this.keys = {};
-        this.speed = 0.2;
+        this.speed = 0.15;
         this.rotationSpeed = 0.05;
         this.cameraAngle = 0;
         this.cameraDistance = 8;
@@ -632,7 +659,7 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
             let box = this.obstacleBoxes[i];
             if (this.playerBox.intersectsBox(box) && this.velocity_y <= 0) {
                 const obstacleTop = obs.position.y + 1;
-                this.player.position.y = obstacleTop + 1.65;
+                this.player.position.y = obstacleTop + 1.35;
                 this.velocity_y = 0;
                 this.isJumping = false;
             }
