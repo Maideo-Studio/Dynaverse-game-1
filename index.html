@@ -14,13 +14,15 @@
 <script>
 class MultiplayerEngine {
     constructor() {
+        this.walkSoundPlaying = false;
         this.keys = {};
         this.speed = 0.2;
         this.rotationSpeed = 0.05;
         this.cameraAngle = 0;
         this.cameraDistance = 8;
         this.cameraHeight = 4;
-
+this.jumpSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dynaversesounds/main/roblox-classic-jump.mp3");
+this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dynaversesounds/main/walk.mp3");
         this.isJumping = false;
         this.velocity_y = 0;
         this.gravity = -0.05;
@@ -584,10 +586,22 @@ class MultiplayerEngine {
         let moved = false;
         const oldPosition = this.player.position.clone();
 
-        if (this.keys["w"]) { this.player.position.add(forward.clone().multiplyScalar(this.speed)); moved = true; }
-        if (this.keys["s"]) { this.player.position.add(forward.clone().multiplyScalar(-this.speed)); moved = true; }
-        if (this.keys["a"]) { this.player.position.add(right.clone().multiplyScalar(-this.speed)); moved = true; }
-        if (this.keys["d"]) { this.player.position.add(right.clone().multiplyScalar(this.speed)); moved = true; }
+        if (this.keys["w"]) { this.player.position.add(forward.clone().multiplyScalar(this.speed)); moved = true;
+         // Play walk sound
+    this.walkSound.play();
+ }
+        if (this.keys["s"]) { this.player.position.add(forward.clone().multiplyScalar(-this.speed)); moved = true; 
+        // Play walk sound
+    this.walkSound.play()
+}
+        if (this.keys["a"]) { this.player.position.add(right.clone().multiplyScalar(-this.speed)); moved = true; 
+        // Play walk sound
+    this.walkSound.play()
+}
+        if (this.keys["d"]) { this.player.position.add(right.clone().multiplyScalar(this.speed)); moved = true; 
+        // Play walk sound
+    this.walkSound.play()
+}
 
         // Horizontal collisions
         this.updatePlayerHitbox(); // ✅ use custom shorter hitbox
@@ -600,6 +614,10 @@ class MultiplayerEngine {
         if (this.keys[" "] && !this.isJumping) {
             this.velocity_y = this.jumpStrength;
             this.isJumping = true;
+            
+                 // Play jump sound
+    this.jumpSound.currentTime = 0; // reset if already playing
+    this.jumpSound.play();
         }
 
         this.player.position.y += this.velocity_y;
@@ -668,6 +686,16 @@ class MultiplayerEngine {
                 }
             });
         }
+            // ===== WALK SOUND LOGIC =====
+    if (moved && !this.walkSoundPlaying) {
+        this.walkSound.loop = true; // loop walking sound
+        this.walkSound.play();
+        this.walkSoundPlaying = true;
+    } else if (!moved && this.walkSoundPlaying) {
+        this.walkSound.pause();
+        this.walkSound.currentTime = 0; // reset so it starts fresh next time
+        this.walkSoundPlaying = false;
+    }
     }
 
     animate() {
