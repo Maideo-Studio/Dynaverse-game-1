@@ -75,7 +75,7 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
     }
 
     initCamera() {
-        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
+        this.camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 70000000);
     }
 
     initRenderer() {
@@ -135,6 +135,39 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
         this.thirdBox = new THREE.Mesh(boxGeo3, boxMat3);
         this.thirdBox.position.set(-10, 1.5, -4.9);
         this.scene.add(this.thirdBox);
+        
+           const boxGeo4 = new THREE.BoxGeometry(16, 2, 1);
+        const texture4 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/dd7e7ed6-c3cf-4c3b-8fcb-7f94ce00f49a.png");
+        texture4.wrapS = texture4.wrapT = THREE.RepeatWrapping;
+        texture4.repeat.set(1, 1);
+        texture4.magFilter = THREE.NearestFilter;
+        const boxMat4 = new THREE.MeshStandardMaterial({ map: texture4 });
+        this.fourthBox = new THREE.Mesh(boxGeo4, boxMat4);
+        this.fourthBox.position.set(-15, 0, -13);
+        this.scene.add(this.fourthBox);
+
+        
+// 1. Smoother geometry
+const boxGeo5 = new THREE.BoxGeometry(500000000, 2000000, 500000000); // Increased size to 50 so it's a large sky dome
+
+// 2. Texture loading
+const texture5 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/ylanite-clouds-5514993_1920.jpg");
+texture5.wrapS = texture5.wrapT = THREE.RepeatWrapping;
+texture5.repeat.set(5,5);
+texture5.magFilter = THREE.LinearFilter; 
+
+// 3. Material and Mesh
+const boxMat5 = new THREE.MeshStandardMaterial({ 
+    map: texture5,
+    roughness: 1,
+    side: THREE.DoubleSide // <--- THIS MAKES THE TEXTURE VISIBLE FROM THE INSIDE
+});
+
+this.fifthBox = new THREE.Mesh(boxGeo5, boxMat5);
+this.fifthBox.position.set(0, 0, 0);
+
+this.scene.add(this.fifthBox);
+
 
         // Player
         this.player = new THREE.Group();
@@ -572,6 +605,9 @@ this.scene.add(this.newBox);
         this.obstacleBoxes = this.obstacles.map(() => new THREE.Box3());
     }
 
+ 
+
+
     // ===== NEW: Shorter Head Hitbox =====
     updatePlayerHitbox() {
         const pos = this.player.position;
@@ -768,6 +804,7 @@ this.scene.add(this.newBox);
         requestAnimationFrame(() => this.animate());
         this.updateMovement();
         this.renderer.render(this.scene, this.camera);
+
     }
 
     addResizeListener() {
