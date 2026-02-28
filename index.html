@@ -123,11 +123,24 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
         const ground2Geo = new THREE.PlaneGeometry(100, 10);
         this.ground2 = new THREE.Mesh(ground2Geo, ground2Mat);
         this.ground2.rotation.x = -Math.PI / 2;
-        this.ground2.position.y = -1.099;
+        this.ground2.position.y = -1.09;
                 this.ground2.position.z = 45;
         this.scene.add(this.ground2);
+        
+              const ground3Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/Dynaverse-faces/main/roblox-stud%20(1).png");
+        ground3Texture.wrapS = ground3Texture.wrapT = THREE.RepeatWrapping;
+        ground3Texture.repeat.set(100, 100);
+        ground3Texture.magFilter = THREE.NearestFilter;
+        const ground3Mat = new THREE.MeshStandardMaterial({ map: ground3Texture, color: 0x00FF00});
+        const ground3Geo = new THREE.PlaneGeometry(100, 100);
+        this.ground3 = new THREE.Mesh(ground3Geo, ground3Mat);
+        this.ground3.rotation.x = -Math.PI / 1;
+        this.ground3.position.y = 25;
+                this.ground3.position.z = 50;
+        this.scene.add(this.ground3);
 
-
+// Ground 3 collision box
+this.ground3Box = new THREE.Box3();
 
 
 
@@ -863,6 +876,30 @@ inventoryImg.style.display = this.item === 1 ? "block" : "none";
         }
 
         // Floor
+        
+        
+// ===== Ground 3 Full Collision (X, Y, Z) =====
+this.ground3Box.setFromObject(this.ground3);
+
+// Horizontal block (X and Z)
+if (this.playerBox.intersectsBox(this.ground3Box)) {
+
+    // If falling onto it (top collision)
+    if (this.velocity_y <= 0 &&
+        this.player.position.y > this.ground3.position.y) {
+
+        const groundTop = this.ground3Box.max.y;
+
+        this.player.position.y = groundTop + 1.35; // player height offset
+        this.velocity_y = 0;
+        this.isJumping = false;
+
+    } else {
+        // Side collision (block X/Z)
+        this.player.position.copy(oldPosition);
+    }
+}
+        
         const halfSize = 50;
         const onGroundArea =
             this.player.position.x > -halfSize &&
