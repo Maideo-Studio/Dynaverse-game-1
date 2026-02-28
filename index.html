@@ -26,6 +26,8 @@
 
 <img id="flashImage" src="https://cdn.pixabay.com/animation/2025/12/14/21/30/21-30-32-171_512.gif">
 
+
+
 <script>
   // Hide after 0.5 seconds (500 milliseconds)
   setTimeout(() => {
@@ -38,9 +40,12 @@
 
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
+
 <script>
+   
 class MultiplayerEngine {
     constructor() {
+            this.item = 0;
         this.walkSoundPlaying = false;
         this.keys = {};
         this.speed = 0.15;
@@ -101,12 +106,34 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
         groundTexture.wrapS = groundTexture.wrapT = THREE.RepeatWrapping;
         groundTexture.repeat.set(100, 100);
         groundTexture.magFilter = THREE.NearestFilter;
-        const groundMat = new THREE.MeshStandardMaterial({ map: groundTexture });
+        const groundMat = new THREE.MeshStandardMaterial({ map: groundTexture});
         const groundGeo = new THREE.PlaneGeometry(100, 100);
         this.ground = new THREE.Mesh(groundGeo, groundMat);
         this.ground.rotation.x = -Math.PI / 2;
         this.ground.position.y = -1.1;
         this.scene.add(this.ground);
+
+
+
+        const ground2Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/Dynaverse-faces/main/roblox-stud%20(1).png");
+        ground2Texture.wrapS = ground2Texture.wrapT = THREE.RepeatWrapping;
+        ground2Texture.repeat.set(100, 10);
+        ground2Texture.magFilter = THREE.NearestFilter;
+        const ground2Mat = new THREE.MeshStandardMaterial({ map: ground2Texture, color: 0x00FF00});
+        const ground2Geo = new THREE.PlaneGeometry(100, 10);
+        this.ground2 = new THREE.Mesh(ground2Geo, ground2Mat);
+        this.ground2.rotation.x = -Math.PI / 2;
+        this.ground2.position.y = -1.099;
+                this.ground2.position.z = 45;
+        this.scene.add(this.ground2);
+
+
+
+
+
+
+
+
 
         // Obstacles & boxes
         const boxGeo = new THREE.BoxGeometry(7, 9, 1);
@@ -153,7 +180,7 @@ const boxGeo5 = new THREE.BoxGeometry(500000000, 2000000, 500000000); // Increas
 // 2. Texture loading
 const texture5 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/ylanite-clouds-5514993_1920.jpg");
 texture5.wrapS = texture5.wrapT = THREE.RepeatWrapping;
-texture5.repeat.set(5,5);
+texture5.repeat.set(5, 5);
 texture5.magFilter = THREE.LinearFilter; 
 
 // 3. Material and Mesh
@@ -167,6 +194,86 @@ this.fifthBox = new THREE.Mesh(boxGeo5, boxMat5);
 this.fifthBox.position.set(0, 0, 0);
 
 this.scene.add(this.fifthBox);
+
+
+
+
+
+
+const boxGeo6 = new THREE.BoxGeometry(65000000000000000000000000000000000000, 3000000000000000000000000000000000000, 6500000000000000000000000000000000000000);
+
+
+const texture6 = loader.load("");
+texture6.wrapS = texture5.wrapT = THREE.RepeatWrapping;
+texture6.repeat.set(5, 5);
+texture6.magFilter = THREE.LinearFilter; 
+
+
+const boxMat6 = new THREE.MeshStandardMaterial({ 
+    map: texture6,
+    roughness: 1,
+       side: THREE.DoubleSide 
+});
+
+this.sixthBox = new THREE.Mesh(boxGeo6, boxMat6);
+this.sixthBox.position.set(0, 0, 0);
+  
+this.scene.add(this.sixthBox);
+
+
+
+const boxGeo7 = new THREE.BoxGeometry(700000000000000000000000000000000000000, 30000000000000000000000000000000000000, 70000000000000000000000000000000000000000);
+
+
+const texture7 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/gdj-tunnel-7626014_1920.png");
+texture7.wrapS = texture5.wrapT = THREE.RepeatWrapping;
+texture7.repeat.set(5, 5);
+texture7.magFilter = THREE.LinearFilter; 
+
+
+const boxMat7 = new THREE.MeshStandardMaterial({ 
+    map: texture7,
+    roughness: 1,
+       side: THREE.DoubleSide 
+});
+
+this.seventhBox = new THREE.Mesh(boxGeo7, boxMat7);
+this.seventhBox.position.set(0, 0, 0);
+  
+this.scene.add(this.seventhBox);
+
+
+
+
+// 1. Smoother geometry
+const boxGeo8 = new THREE.BoxGeometry(1, 1, 0.001); // Increased size to 50 so it's a large sky dome
+
+// 2. Texture loading
+const texture8 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/00aed48c-afec-47c5-ba3b-c3f107e4298a%20(1).png");
+texture8.wrapS = texture5.wrapT = THREE.RepeatWrapping;
+texture8.repeat.set(1, 1);
+texture8.magFilter = THREE.LinearFilter; 
+
+// 3. Material and Mesh
+const boxMat8 = new THREE.MeshStandardMaterial({ 
+    map: texture8,
+    roughness: 1,
+    side: THREE.DoubleSide
+});
+
+this.eigthBox = new THREE.Mesh(boxGeo8, boxMat8);
+this.eigthBox.position.set(-18, 1.45, -13);
+
+this.scene.add(this.eigthBox);
+
+
+
+
+
+
+
+
+
 
 
         // Player
@@ -677,6 +784,21 @@ this.scene.add(this.newBox);
     }
 
     updateMovement() {
+// Update player hitbox
+this.updatePlayerHitbox();
+
+// Check collision with obstacle 8
+const obstacle8Box = new THREE.Box3().setFromObject(this.eigthBox);
+if (this.playerBox.intersectsBox(obstacle8Box)) {
+    if (this.keys["p"]) {
+    this.item = 1; // player touched obstacle 8
+    }
+} 
+// Update inventory display
+const inventoryImg = document.getElementById("inventoryItem");
+inventoryImg.style.display = this.item === 1 ? "block" : "none";
+
+
         const forward = new THREE.Vector3();
         this.camera.getWorldDirection(forward);
         forward.y = 0;
@@ -798,6 +920,29 @@ this.scene.add(this.newBox);
         this.walkSound.currentTime = 0; // reset so it starts fresh next time
         this.walkSoundPlaying = false;
     }
+    
+    
+
+const fallLimit = -500; 
+if (this.player.position.y < fallLimit) {
+    // Reset player to spawn
+    this.player.position.set(0, 5, 0); 
+    this.velocity_y = 0;
+    this.isJumping = false;
+
+
+    this.item = 0;
+    const inventoryImg = document.getElementById("inventoryItem");
+    inventoryImg.style.display = "none";
+
+    console.log("You fell too far and died! Respawning...");
+}
+    
+    
+    
+    
+    
+    
     }
 
     animate() {
@@ -818,5 +963,37 @@ this.scene.add(this.newBox);
 
 new MultiplayerEngine();
 </script>
+<style>#bottomImage {
+  position: fixed;          /* overlay on top of canvas */
+  top: 50%;                 /* vertical center */
+  left: 50%;                /* horizontal center */
+  transform: translate(70%, 200%);  /* true center */
+  width: 400px;             /* make it bigger */
+  height: auto;             /* maintain aspect ratio */
+  z-index: 10;              /* above canvas */
+}</style>
+
+<div id="inventory" 
+     style="
+            position: fixed;
+        bottom: 10vh;             /* 5% from bottom of screen */
+        right: 24vw;              /* 5% from right of screen */
+        display: flex;
+        flex-direction: row;     /* horizontal row */
+        gap: 1vw;                /* space between items */
+        z-index: 1000;           /* above canvas */
+        flex-wrap: nowrap;       /* keep in one row */
+     ">
+    <img id="inventoryItem" 
+         src="https://github.com/Maideo-Studio/textures/blob/main/00aed48c-afec-47c5-ba3b-c3f107e4298a%20(1).png?raw=true" 
+         style="width: 80px; max-width: 80px; display: none;">
+</div>
+
+
+         
+<img id="bottomImage" src="https://github.com/Maideo-Studio/textures/blob/main/output-onlinepngtools%20(3).png?raw=true">
+
+ 
 </body>
+
 </html>
