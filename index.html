@@ -21,12 +21,7 @@
 </head>
 <body>
 
-
-
-
 <img id="flashImage" src="https://cdn.pixabay.com/animation/2025/12/14/21/30/21-30-32-171_512.gif">
-
-
 
 <script>
   // Hide after 0.5 seconds (500 milliseconds)
@@ -34,10 +29,16 @@
     document.getElementById("flashImage").style.display = "none";
   }, 1000);
 </script>
+<script>
+    
+    var canvas = document.getElementById("game-canvas");
 
+canvas.addEventListener("click", function () {
+    // Request to lock the pointer to the canvas element
+    canvas.requestPointerLock();
+});
 
-
-
+</script>
 <script src="https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.min.js"></script>
 <script src="https://cdn.scaledrone.com/scaledrone.min.js"></script>
 
@@ -45,16 +46,17 @@
    
 class MultiplayerEngine {
     constructor() {
-            this.item = 0;
+        this.item = 0;
         this.walkSoundPlaying = false;
         this.keys = {};
         this.speed = 0.15;
         this.rotationSpeed = 0.05;
         this.cameraAngle = 0;
+        this.cameraPitch = 0; // Added for vertical look
         this.cameraDistance = 8;
         this.cameraHeight = 4;
-this.jumpSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dynaversesounds/main/roblox-classic-jump.mp3");
-this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dynaversesounds/main/walk.mp3");
+        this.jumpSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dynaversesounds/main/roblox-classic-jump.mp3");
+        this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dynaversesounds/main/walk.mp3");
         this.isJumping = false;
         this.velocity_y = 0;
         this.gravity = -0.05;
@@ -113,8 +115,6 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
         this.ground.position.y = -1.1;
         this.scene.add(this.ground);
 
-
-
         const ground2Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/Dynaverse-faces/main/roblox-stud%20(1).png");
         ground2Texture.wrapS = ground2Texture.wrapT = THREE.RepeatWrapping;
         ground2Texture.repeat.set(100, 10);
@@ -124,10 +124,10 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
         this.ground2 = new THREE.Mesh(ground2Geo, ground2Mat);
         this.ground2.rotation.x = -Math.PI / 2;
         this.ground2.position.y = -1.09;
-                this.ground2.position.z = 45;
+        this.ground2.position.z = 45;
         this.scene.add(this.ground2);
         
-              const ground3Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/Dynaverse-faces/main/roblox-stud%20(1).png");
+        const ground3Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/Dynaverse-faces/main/roblox-stud%20(1).png");
         ground3Texture.wrapS = ground3Texture.wrapT = THREE.RepeatWrapping;
         ground3Texture.repeat.set(100, 100);
         ground3Texture.magFilter = THREE.NearestFilter;
@@ -136,19 +136,11 @@ this.walkSound = new Audio("https://raw.githubusercontent.com/Maideo-Studio/Dyna
         this.ground3 = new THREE.Mesh(ground3Geo, ground3Mat);
         this.ground3.rotation.x = -Math.PI / 1;
         this.ground3.position.y = 25;
-                this.ground3.position.z = 50;
+        this.ground3.position.z = 50;
         this.scene.add(this.ground3);
 
-// Ground 3 collision box
-this.ground3Box = new THREE.Box3();
+        this.ground3Box = new THREE.Box3();
 
-
-
-
-
-
-
-        // Obstacles & boxes
         const boxGeo = new THREE.BoxGeometry(7, 9, 1);
         const textureLoader = new THREE.TextureLoader();
         const texture = textureLoader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/main/6c73f79e-38f2-4f6e-aab7-d66f7f1755de.png");
@@ -176,7 +168,7 @@ this.ground3Box = new THREE.Box3();
         this.thirdBox.position.set(-10, 1.5, -4.9);
         this.scene.add(this.thirdBox);
         
-           const boxGeo4 = new THREE.BoxGeometry(16, 2, 1);
+        const boxGeo4 = new THREE.BoxGeometry(16, 2, 1);
         const texture4 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/dd7e7ed6-c3cf-4c3b-8fcb-7f94ce00f49a.png");
         texture4.wrapS = texture4.wrapT = THREE.RepeatWrapping;
         texture4.repeat.set(1, 1);
@@ -186,110 +178,37 @@ this.ground3Box = new THREE.Box3();
         this.fourthBox.position.set(-15, 0, -13);
         this.scene.add(this.fourthBox);
 
-        
-// 1. Smoother geometry
-const boxGeo5 = new THREE.BoxGeometry(500000000, 2000000, 500000000); // Increased size to 50 so it's a large sky dome
+        const boxGeo5 = new THREE.BoxGeometry(500000000, 2000000, 500000000); 
+        const texture5 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/ylanite-clouds-5514993_1920.jpg");
+        texture5.wrapS = texture5.wrapT = THREE.RepeatWrapping;
+        texture5.repeat.set(5, 5);
+        texture5.magFilter = THREE.LinearFilter; 
+        const boxMat5 = new THREE.MeshStandardMaterial({ map: texture5, roughness: 1, side: THREE.DoubleSide });
+        this.fifthBox = new THREE.Mesh(boxGeo5, boxMat5);
+        this.fifthBox.position.set(0, 0, 0);
+        this.scene.add(this.fifthBox);
 
-// 2. Texture loading
-const texture5 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/ylanite-clouds-5514993_1920.jpg");
-texture5.wrapS = texture5.wrapT = THREE.RepeatWrapping;
-texture5.repeat.set(5, 5);
-texture5.magFilter = THREE.LinearFilter; 
+        const boxGeo6 = new THREE.BoxGeometry(65000000000000000000000000000000000000, 3000000000000000000000000000000000000, 6500000000000000000000000000000000000000);
+        const texture6 = loader.load("");
+        const boxMat6 = new THREE.MeshStandardMaterial({ map: texture6, roughness: 1, side: THREE.DoubleSide });
+        this.sixthBox = new THREE.Mesh(boxGeo6, boxMat6);
+        this.sixthBox.position.set(0, 0, 0);
+        this.scene.add(this.sixthBox);
 
-// 3. Material and Mesh
-const boxMat5 = new THREE.MeshStandardMaterial({ 
-    map: texture5,
-    roughness: 1,
-    side: THREE.DoubleSide // <--- THIS MAKES THE TEXTURE VISIBLE FROM THE INSIDE
-});
+        const boxGeo7 = new THREE.BoxGeometry(700000000000000000000000000000000000000, 30000000000000000000000000000000000000, 70000000000000000000000000000000000000000);
+        const texture7 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/gdj-tunnel-7626014_1920.png");
+        const boxMat7 = new THREE.MeshStandardMaterial({ map: texture7, roughness: 1, side: THREE.DoubleSide });
+        this.seventhBox = new THREE.Mesh(boxGeo7, boxMat7);
+        this.seventhBox.position.set(0, 0, 0);
+        this.scene.add(this.seventhBox);
 
-this.fifthBox = new THREE.Mesh(boxGeo5, boxMat5);
-this.fifthBox.position.set(0, 0, 0);
+        const boxGeo8 = new THREE.BoxGeometry(1, 1, 0.001); 
+        const texture8 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/00aed48c-afec-47c5-ba3b-c3f107e4298a%20(1).png");
+        const boxMat8 = new THREE.MeshStandardMaterial({ map: texture8, roughness: 1, side: THREE.DoubleSide });
+        this.eigthBox = new THREE.Mesh(boxGeo8, boxMat8);
+        this.eigthBox.position.set(-18, 1.45, -13);
+        this.scene.add(this.eigthBox);
 
-this.scene.add(this.fifthBox);
-
-
-
-
-
-
-const boxGeo6 = new THREE.BoxGeometry(65000000000000000000000000000000000000, 3000000000000000000000000000000000000, 6500000000000000000000000000000000000000);
-
-
-const texture6 = loader.load("");
-texture6.wrapS = texture5.wrapT = THREE.RepeatWrapping;
-texture6.repeat.set(5, 5);
-texture6.magFilter = THREE.LinearFilter; 
-
-
-const boxMat6 = new THREE.MeshStandardMaterial({ 
-    map: texture6,
-    roughness: 1,
-       side: THREE.DoubleSide 
-});
-
-this.sixthBox = new THREE.Mesh(boxGeo6, boxMat6);
-this.sixthBox.position.set(0, 0, 0);
-  
-this.scene.add(this.sixthBox);
-
-
-
-const boxGeo7 = new THREE.BoxGeometry(700000000000000000000000000000000000000, 30000000000000000000000000000000000000, 70000000000000000000000000000000000000000);
-
-
-const texture7 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/gdj-tunnel-7626014_1920.png");
-texture7.wrapS = texture5.wrapT = THREE.RepeatWrapping;
-texture7.repeat.set(5, 5);
-texture7.magFilter = THREE.LinearFilter; 
-
-
-const boxMat7 = new THREE.MeshStandardMaterial({ 
-    map: texture7,
-    roughness: 1,
-       side: THREE.DoubleSide 
-});
-
-this.seventhBox = new THREE.Mesh(boxGeo7, boxMat7);
-this.seventhBox.position.set(0, 0, 0);
-  
-this.scene.add(this.seventhBox);
-
-
-
-
-// 1. Smoother geometry
-const boxGeo8 = new THREE.BoxGeometry(1, 1, 0.001); // Increased size to 50 so it's a large sky dome
-
-// 2. Texture loading
-const texture8 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/00aed48c-afec-47c5-ba3b-c3f107e4298a%20(1).png");
-texture8.wrapS = texture5.wrapT = THREE.RepeatWrapping;
-texture8.repeat.set(1, 1);
-texture8.magFilter = THREE.LinearFilter; 
-
-// 3. Material and Mesh
-const boxMat8 = new THREE.MeshStandardMaterial({ 
-    map: texture8,
-    roughness: 1,
-    side: THREE.DoubleSide
-});
-
-this.eigthBox = new THREE.Mesh(boxGeo8, boxMat8);
-this.eigthBox.position.set(-18, 1.45, -13);
-
-this.scene.add(this.eigthBox);
-
-
-
-
-
-
-
-
-
-
-
-        // Player
         this.player = new THREE.Group();
         this.player.position.y = 0.5;
         this.scene.add(this.player);
@@ -337,382 +256,43 @@ this.scene.add(this.eigthBox);
         this.rightLeg.scale.set(0.2, 0.6, 0.3);
         this.player.add(this.rightLeg);
 
+        const newBoxGeo = new THREE.BoxGeometry(7, 4, 0.001); 
+        const newTexture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/e7bd7d50-1c14-4a5c-a9c3-1924386c3e0d.png"); 
+        newTexture.wrapS = newTexture.wrapT = THREE.RepeatWrapping;
+        newTexture.repeat.set(1, 1);
+        newTexture.magFilter = THREE.NearestFilter;
+        const newBoxMat = new THREE.MeshStandardMaterial({ map: newTexture, color: 0xFFFFFF });
+        this.newBox = new THREE.Mesh(newBoxGeo, newBoxMat);
+        this.newBox.position.set(-15, 5, -17); 
+        this.scene.add(this.newBox);
 
-
-
-
-
-// --- NEW TEXTURED CUBE ---
-const newBoxGeo = new THREE.BoxGeometry(7, 4, 0.001); // width, height, depth
-const newTexture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/e7bd7d50-1c14-4a5c-a9c3-1924386c3e0d.png"); // replace with your texture
-newTexture.wrapS = newTexture.wrapT = THREE.RepeatWrapping;
-newTexture.repeat.set(1, 1);
-newTexture.magFilter = THREE.NearestFilter;
-
-const newBoxMat = new THREE.MeshStandardMaterial({
-    map: newTexture,
-    color: 0xFFFFFF // change this to adjust darkness
-});
-
-this.newBox = new THREE.Mesh(newBoxGeo, newBoxMat);
-
-
-
-
-
-// Position the cube somewhere in the scene
-this.newBox.position.set(-15, 5, -17); // x, y, z
-
-// Add it to the scene
-this.scene.add(this.newBox);
-
-
-
-
-
-
-
-
-
-
-
-        // Obstacles (same as original)
         const obstacleTexture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/main/image%20(5).png");
         obstacleTexture.magFilter = THREE.NearestFilter;
         obstacleTexture.wrapS = obstacleTexture.wrapT = THREE.RepeatWrapping;
         obstacleTexture.repeat.set(0.3, 0.3);
-
         const obstacleGeo = new THREE.BoxGeometry(1, 2, 2);
         const obstacleMat = new THREE.MeshStandardMaterial({ map: obstacleTexture });
 
         this.obstacles = [];
         const obstaclePositions = [
-                      [-6, 0, -10],
-            [-6, 0, -12],
-            [-6, 0, -14],
-            [-6, 0, -16],
-            [-6, 0, -18],
-            [-7, 0, -18],
-            [-8, 0, -18],
-            [-8, 2, -18],
-            [-8, 4, -18],
-            [-8, 6, -18],
-             [-8, 8, -18],
-              [-7, 8, -18],
-                [-6, 8, -18],
-                  [-6, 7, -18],
-                    [-7, 6, -18],
-                     [-7, 5, -18],
-                      [-7, 4, -18],
-                       [-7, 2, -18],
-                        [-7, 0, -18],
-                             [-6, 0, -18],
-                             [-6, 2, -18],
-                                 [-6, 4, -18],
-      [-6, 6, -18],
-              [-6, 0, -8],
-                          [-6, 0, -6],
-                        [-6, 2, -10],
-                         [-6, 4, -10],
-                          [-6, 6, -10],
-                           [-6, 8, -10],
-                 [-6, 2, -12],
-                    [-6, 4, -12],
-                               [-6, 6, -12],
-                                          [-6, 8, -12],
-                                                   [-6, 8, -14],
-      [-6, 6, -14],
-            [-6, 4, -14],
-                  [-6, 2, -14],
-                    [-6, 2, -16],
-                                        [-6, 4, -16],
-                                        [-6, 6, -16],
-                                        [-6, 8, -16],
-                                        [-6, 8, -8],
-                    [-6, 6, -8],
-                    [-6, 4, -8],
-                    [-6, 2, -8],
-                                                            [-6, 8, -6],
-                    [-6, 6, -6],
-                    [-6, 4, -6],
-                    [-6, 2, -6],
-                            [-7, 2, -6],
-                                   [-7, 0, -6],
-                                   [-7, 4, -6],
-                                   [-7, 6, -6],
-                                   [-7, 8, -6],
-    [-8, 8, -6],
-    [-8, 6, -6],
-    [-8, 4, -6],
-    [-8, 2, -6],
-    [-8, 0, -6],
-    
-        [-9, 8, -6],
-    [-9, 6, -6],
-    [-9, 4, -6],
-    [-9, 2, -6],
-    [-9, 0, -6],
-    
-            [-10, 8, -6],
-    [-10, 6, -6],
-    [-10, 4, -6],
-    [-10, 2, -6],
-    [-10, 0, -6],
-    
-                [-11, 8, -6],
-    [-11, 6, -6],
-    [-11, 4, -6],
-    [-11, 2, -6],
-    [-11, 0, -6],
-    
-                    [-12, 8, -6],
-    [-12, 6, -6],
-    [-12, 4, -6],
-    [-12, 2, -6],
-    [-12, 0, -6],
-    
-        [-13, 4, -6],
-             [-14, 5, -6],
-                    [-15, 5, -6],
-         
-                                          [-17,4, -6],
-                [-17,2, -6],
-                      [-17,4, -6],
-                         [-17,0, -6],
-                            [-17,6, -6],
-                               [-17,8, -6],
-                               [-16,8, -6],
-                                  [-16,6, -6],
-                                  [-16,6, -6],
-                                       [-16,5, -6],
-                                            [-16,4, -6],
-                                                      [-15,6, -6],
-                                            
-                                                         [-15,8, -6],
-                                                         [-14,8, -6],
-                                                         [-14,6, -6],
-                                                         [-13,6, -6],
-                                                         [-13,8, -6],
-                        [-18 ,8, -6],
-                                [-18 ,6, -6],
-                                [-18 ,4, -6],
-                                         [-18 ,2, -6],
-                                [-18 ,0, -6],
-                                
-                                               [-19 ,8, -6],
-                                [-19 ,6, -6],
-                                [-19 ,4, -6],
-                                      [-19 ,2, -6],
-                                [-19 ,0, -6],
-                                [-20 ,0, -6],
-                                [-20 ,2, -6],
-                                [-20 ,4, -6],
-                                [-20 ,6, -6],
-                                [-20 ,8, -6],
-                                
-                                   [-21 ,0, -6],
-                                [-21 ,2, -6],
-                                [-21 ,4, -6],
-                                [-21 ,6, -6],
-                                [-21 ,8, -6],
-                                
-                                     [-22 ,0, -6],
-                                [-22 ,2, -6],
-                                [-22 ,4, -6],
-                                [-22 ,6, -6],
-                                [-22 ,8, -6],
-                                
-                                         [-23 ,0, -6],
-                                [-23 ,2, -6],
-                                [-23 ,4, -6],
-                                [-23 ,6, -6],
-                                [-23 ,8, -6],
-                                
-                                   
-                                                [-23 ,0, -7],
-                                [-23 ,2, -7],
-                                [-23 ,4, -7],
-                                [-23 ,6, -7],
-                                [-23 ,8, -7],
-                                
-                                                                                [-23 ,0, -8],
-                                [-23 ,2, -8],
-                                [-23 ,4, -8],
-                                [-23 ,6, -8],
-                                [-23 ,8, -8],
-                                                                                [-23 ,0, -9],
-                                [-23 ,2, -9],
-                                [-23 ,4, -9],
-                                [-23 ,6, -9],
-                                [-23 ,8, -9],
-                                
-                                 [-23 ,0, -10],
-                                [-23 ,2, -10],
-                                [-23 ,4, -10],
-                                [-23 ,6, -10],
-                                [-23 ,8, -10],
-                                
-                                 [-23 ,0, -11],
-                                [-23 ,2, -11],
-                                [-23 ,4, -11],
-                                [-23 ,6, -11],
-                                [-23 ,8, -11],
-                                
-                                 [-23 ,0, -12],
-                                [-23 ,2, -12],
-                                [-23 ,4, -12],
-                                [-23 ,6, -12],
-                                [-23 ,8, -12],
-                                
-                                 [-23 ,0, -13],
-                                [-23 ,2, -13],
-                                [-23 ,4, -13],
-                                [-23 ,6, -13],
-                                [-23 ,8, -13],
-                                
-                                 [-23 ,0, -14],
-                                [-23 ,2, -14],
-                                [-23 ,4, -14],
-                                [-23 ,6, -14],
-                                [-23 ,8, -14],
-                                
-                                 [-23 ,0, -15],
-                                [-23 ,2, -15],
-                                [-23 ,4, -15],
-                                [-23 ,6, -15],
-                                [-23 ,8, -15],
-                                
-                                 [-23 ,0, -16],
-                                [-23 ,2, -16],
-                                [-23 ,4, -16],
-                                [-23 ,6, -16],
-                                [-23 ,8, -16],
-                                
-                                                      [-23 ,0, -17],
-                                [-23 ,2, -17],
-                                [-23 ,4, -17],
-                                [-23 ,6, -17],
-                                [-23 ,8, -17],
-                                               
-                                               
-                                              [-23 ,0, -18],
-                                [-23 ,2, -18],
-                                [-23 ,4, -18],
-                                [-23 ,6, -18],
-                                [-23 ,8, -18],
-                                
-                                       [-22 ,0, -18],
-                                [-22 ,2, -18],
-                                [-22 ,4, -18],
-                                [-22 ,6, -18],
-                                [-22 ,8, -18],
-                                
-                                                  [-21 ,0, -18],
-                                [-21 ,2, -18],
-                                [-21 ,4, -18],
-                                [-21 ,6, -18],
-                                [-21 ,8, -18],
-                                
-                                                     [-20 ,0, -18],
-                                [-20 ,2, -18],
-                                [-20 ,4, -18],
-                                [-20 ,6, -18],
-                                [-20 ,8, -18],
-                                
-                                                     [-19 ,0, -18],
-                                [-19 ,2, -18],
-                                [-19 ,4, -18],
-                                [-19 ,6, -18],
-                                [-19 ,8, -18],
-                                
-                                                     [-18 ,0, -18],
-                                [-18 ,2, -18],
-                                [-18 ,4, -18],
-                                [-18 ,6, -18],
-                                [-18 ,8, -18],
-                                
-                                                 [-17 ,0, -18],
-                                [-17 ,2, -18],
-                                [-17 ,4, -18],
-                                [-17 ,6, -18],
-                                [-17 ,8, -18],
-                                
-                                   [-16 ,0, -18],
-                                [-16 ,2, -18],
-                                [-16 ,4, -18],
-                                [-16 ,6, -18],
-                                [-16 ,8, -18],
-                                
-                                             [-15 ,0, -18],
-                                [-15 ,2, -18],
-                                [-15 ,4, -18],
-                                [-15 ,6, -18],
-                                [-15 ,8, -18],
-                                
-                                                     [-14 ,0, -18],
-                                [-14 ,2, -18],
-                                [-14 ,4, -18],
-                                [-14 ,6, -18],
-                                [-14 ,8, -18],
-                                
-                                                     [-13 ,0, -18],
-                                [-13 ,2, -18],
-                                [-13 ,4, -18],
-                                [-13 ,6, -18],
-                                [-13 ,8, -18],
-                                
-                                                     [-12 ,0, -18],
-                                [-12 ,2, -18],
-                                [-12 ,4, -18],
-                                [-12 ,6, -18],
-                                [-12 ,8, -18],
-                                
-                                                     [-11 ,0, -18],
-                                [-11 ,2, -18],
-                                [-11 ,4, -18],
-                                [-11 ,6, -18],
-                                [-11 ,8, -18],
-                                
-                                                     [-10 ,0, -18],
-                                [-10 ,2, -18],
-                                [-10 ,4, -18],
-                                [-10 ,6, -18],
-                                [-10 ,8, -18],
-                         
-                                                     [-9 ,0, -18],
-                                [-9 ,2, -18],
-                                [-9 ,4, -18],
-                                [-9 ,6, -18],
-                                [-9 ,8, -18],
-                                
-                                            [-8 ,0, -18],
-                                [-9 ,2, -18],
-                                [-9 ,4, -18],
-                                [-9 ,6, -18],
-                                [-9 ,8, -18]
-            // ... truncated for brevity, keep all original positions
+            [-6, 0, -10], [-6, 0, -12], [-6, 0, -14], [-6, 0, -16], [-6, 0, -18], [-7, 0, -18], [-8, 0, -18], [-8, 2, -18], [-8, 4, -18], [-8, 6, -18], [-8, 8, -18], [-7, 8, -18], [-6, 8, -18], [-6, 7, -18], [-7, 6, -18], [-7, 5, -18], [-7, 4, -18], [-7, 2, -18], [-7, 0, -18], [-6, 0, -18], [-6, 2, -18], [-6, 4, -18], [-6, 6, -18], [-6, 0, -8], [-6, 0, -6], [-6, 2, -10], [-6, 4, -10], [-6, 6, -10], [-6, 8, -10], [-6, 2, -12], [-6, 4, -12], [-6, 6, -12], [-6, 8, -12], [-6, 8, -14], [-6, 6, -14], [-6, 4, -14], [-6, 2, -14], [-6, 2, -16], [-6, 4, -16], [-6, 6, -16], [-6, 8, -16], [-6, 8, -8], [-6, 6, -8], [-6, 4, -8], [-6, 2, -8], [-6, 8, -6], [-6, 6, -6], [-6, 4, -6], [-6, 2, -6], [-7, 2, -6], [-7, 0, -6], [-7, 4, -6], [-7, 6, -6], [-7, 8, -6], [-8, 8, -6], [-8, 6, -6], [-8, 4, -6], [-8, 2, -6], [-8, 0, -6], [-9, 8, -6], [-9, 6, -6], [-9, 4, -6], [-9, 2, -6], [-9, 0, -6], [-10, 8, -6], [-10, 6, -6], [-10, 4, -6], [-10, 2, -6], [-10, 0, -6], [-11, 8, -6], [-11, 6, -6], [-11, 4, -6], [-11, 2, -6], [-11, 0, -6], [-12, 8, -6], [-12, 6, -6], [-12, 4, -6], [-12, 2, -6], [-12, 0, -6], [-13, 4, -6], [-14, 5, -6], [-15, 5, -6], [-17,4, -6], [-17,2, -6], [-17,4, -6], [-17,0, -6], [-17,6, -6], [-17,8, -6], [-16,8, -6], [-16,6, -6], [-16,6, -6], [-16,5, -6], [-16,4, -6], [-15,6, -6], [-15,8, -6], [-14,8, -6], [-14,6, -6], [-13,6, -6], [-13,8, -6], [-18 ,8, -6], [-18 ,6, -6], [-18 ,4, -6], [-18 ,2, -6], [-18 ,0, -6], [-19 ,8, -6], [-19 ,6, -6], [-19 ,4, -6], [-19 ,2, -6], [-19 ,0, -6], [-20 ,0, -6], [-20 ,2, -6], [-20 ,4, -6], [-20 ,6, -6], [-20 ,8, -6], [-21 ,0, -6], [-21 ,2, -6], [-21 ,4, -6], [-21 ,6, -6], [-21 ,8, -6], [-22 ,0, -6], [-22 ,2, -6], [-22 ,4, -6], [-22 ,6, -6], [-22 ,8, -6], [-23 ,0, -6], [-23 ,2, -6], [-23 ,4, -6], [-23 ,6, -6], [-23 ,8, -6], [-23 ,0, -7], [-23 ,2, -7], [-23 ,4, -7], [-23 ,6, -7], [-23 ,8, -7], [-23 ,0, -8], [-23 ,2, -8], [-23 ,4, -8], [-23 ,6, -8], [-23 ,8, -8], [-23 ,0, -9], [-23 ,2, -9], [-23 ,4, -9], [-23 ,6, -9], [-23 ,8, -9], [-23 ,0, -10], [-23 ,2, -10], [-23 ,4, -10], [-23 ,6, -10], [-23 ,8, -10], [-23 ,0, -11], [-23 ,2, -11], [-23 ,4, -11], [-23 ,6, -11], [-23 ,8, -11], [-23 ,0, -12], [-23 ,2, -12], [-23 ,4, -12], [-23 ,6, -12], [-23 ,8, -12], [-23 ,0, -13], [-23 ,2, -13], [-23 ,4, -13], [-23 ,6, -13], [-23 ,8, -13], [-23 ,0, -14], [-23 ,2, -14], [-23 ,4, -14], [-23 ,6, -14], [-23 ,8, -14], [-23 ,0, -15], [-23 ,2, -15], [-23 ,4, -15], [-23 ,6, -15], [-23 ,8, -15], [-23 ,0, -16], [-23 ,2, -16], [-23 ,4, -16], [-23 ,6, -16], [-23 ,8, -16], [-23 ,0, -17], [-23 ,2, -17], [-23 ,4, -17], [-23 ,6, -17], [-23 ,8, -17], [-23 ,0, -18], [-23 ,2, -18], [-23 ,4, -18], [-23 ,6, -18], [-23 ,8, -18], [-22 ,0, -18], [-22 ,2, -18], [-22 ,4, -18], [-22 ,6, -18], [-22 ,8, -18], [-21 ,0, -18], [-21 ,2, -18], [-21 ,4, -18], [-21 ,6, -18], [-21 ,8, -18], [-20 ,0, -18], [-20 ,2, -18], [-20 ,4, -18], [-20 ,6, -18], [-20 ,8, -18], [-19 ,0, -18], [-19 ,2, -18], [-19 ,4, -18], [-19 ,6, -18], [-19 ,8, -18], [-18 ,0, -18], [-18 ,2, -18], [-18 ,4, -18], [-18 ,6, -18], [-18 ,8, -18], [-17 ,0, -18], [-17 ,2, -18], [-17 ,4, -18], [-17 ,6, -18], [-17 ,8, -18], [-16 ,0, -18], [-16 ,2, -18], [-16 ,4, -18], [-16 ,6, -18], [-16 ,8, -18], [-15 ,0, -18], [-15 ,2, -18], [-15 ,4, -18], [-15 ,6, -18], [-15 ,8, -18], [-14 ,0, -18], [-14 ,2, -18], [-14 ,4, -18], [-14 ,6, -18], [-14 ,8, -18], [-13 ,0, -18], [-13 ,2, -18], [-13 ,4, -18], [-13 ,6, -18], [-13 ,8, -18], [-12 ,0, -18], [-12 ,2, -18], [-12 ,4, -18], [-12 ,6, -18], [-12 ,8, -18], [-11 ,0, -18], [-11 ,2, -18], [-11 ,4, -18], [-11 ,6, -18], [-11 ,8, -18], [-10 ,0, -18], [-10 ,2, -18], [-10 ,4, -18], [-10 ,6, -18], [-10 ,8, -18], [-9 ,0, -18], [-9 ,2, -18], [-9 ,4, -18], [-9 ,6, -18], [-9 ,8, -18], [-8 ,0, -18], [-9 ,2, -18], [-9 ,4, -18], [-9 ,6, -18], [-9 ,8, -18]
         ];
-   const obstacle2Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(6).png");
+        const obstacle2Texture = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(6).png");
         obstacle2Texture.magFilter = THREE.NearestFilter;
         obstacle2Texture.wrapS = obstacle2Texture.wrapT = THREE.RepeatWrapping;
-        obstacle2Texture.repeat.set(1, 1); // make texture appear bigger
+        obstacle2Texture.repeat.set(1, 1); 
 
         const obstacle2Geo = new THREE.BoxGeometry(18, 1, 14 );
         const obstacle2Mat = new THREE.MeshStandardMaterial({ map: obstacle2Texture });
 
         this.obstacle2s = [];
-
-        const obstacle2Positions = [
-            [-14.5,9.5,-12]
-    ];
+        const obstacle2Positions = [[-14.5,9.5,-12]];
         obstacle2Positions.forEach(pos => {
-    const obstacle = new THREE.Mesh(obstacle2Geo, obstacle2Mat);
-
-    obstacle.position.set(pos[0], pos[1], pos[2]);
-
-    this.scene.add(obstacle);   // or scene.add(obstacle) depending on your setup
-    this.obstacle2s.push(obstacle);
-});
+            const obstacle = new THREE.Mesh(obstacle2Geo, obstacle2Mat);
+            obstacle.position.set(pos[0], pos[1], pos[2]);
+            this.scene.add(obstacle);
+            this.obstacle2s.push(obstacle);
+        });
         for (let pos of obstaclePositions) {
             const obs = new THREE.Mesh(obstacleGeo, obstacleMat);
             obs.position.set(pos[0], pos[1], pos[2]);
@@ -720,19 +300,14 @@ this.scene.add(this.newBox);
             this.obstacles.push(obs);
         }
 
-        // Boxes for collision
         this.playerBox = new THREE.Box3();
         this.obstacleBoxes = this.obstacles.map(() => new THREE.Box3());
     }
 
- 
-
-
-    // ===== NEW: Shorter Head Hitbox =====
     updatePlayerHitbox() {
         const pos = this.player.position;
         const min = new THREE.Vector3(pos.x - 0.75, pos.y - 1.3, pos.z - 0.25);
-        const max = new THREE.Vector3(pos.x + 0.75, pos.y + 1.0, pos.z + 0.25); // shorter head
+        const max = new THREE.Vector3(pos.x + 0.75, pos.y + 1.0, pos.z + 0.25); 
         this.playerBox.min.copy(min);
         this.playerBox.max.copy(max);
     }
@@ -740,6 +315,16 @@ this.scene.add(this.newBox);
     initControls() {
         window.addEventListener("keydown", (e) => this.keys[e.key.toLowerCase()] = true);
         window.addEventListener("keyup", (e) => this.keys[e.key.toLowerCase()] = false);
+        
+        // --- ADDED MOUSE LOOK LISTENER ---
+        window.addEventListener("mousemove", (e) => {
+            const sensitivity = 0.003;
+            this.cameraAngle -= e.movementX * sensitivity;
+            this.cameraPitch -= e.movementY * sensitivity;
+            // Clamp pitch to prevent flipping
+            this.cameraPitch = Math.max(-Math.PI / 2 + 0.1, Math.min(Math.PI / 2 - 0.1, this.cameraPitch));
+        });
+        window.addEventListener("click", () => { document.body.requestPointerLock(); });
     }
 
     initScaledrone() {
@@ -797,20 +382,27 @@ this.scene.add(this.newBox);
     }
 
     updateMovement() {
-// Update player hitbox
-this.updatePlayerHitbox();
+        this.updatePlayerHitbox();
 
-// Check collision with obstacle 8
-const obstacle8Box = new THREE.Box3().setFromObject(this.eigthBox);
-if (this.playerBox.intersectsBox(obstacle8Box)) {
-    if (this.keys["p"]) {
-    this.item = 1; // player touched obstacle 8
-    }
-} 
-// Update inventory display
-const inventoryImg = document.getElementById("inventoryItem");
-inventoryImg.style.display = this.item === 1 ? "block" : "none";
-
+        const obstacle8Box = new THREE.Box3().setFromObject(this.eigthBox);
+        if (this.playerBox.intersectsBox(obstacle8Box)) {
+            if (this.keys["p"]) {
+                this.item = 1; 
+            }
+        } 
+        const inventoryImg = document.getElementById("inventoryItem");
+        inventoryImg.style.display = this.item === 1 ? "block" : "none";
+        
+if (this.item == 1) {
+ if (this.keys["1"]) {
+                   this.player.position.y += 4
+                   this.player.position.x += 2
+                   this.player.position.z += 7
+                    this.player.rotation.x += 20
+                      this.player.rotation.y += 20
+                    
+            }
+}
 
         const forward = new THREE.Vector3();
         this.camera.getWorldDirection(forward);
@@ -823,47 +415,30 @@ inventoryImg.style.display = this.item === 1 ? "block" : "none";
         let moved = false;
         const oldPosition = this.player.position.clone();
 
-        if (this.keys["w"]) { this.player.position.add(forward.clone().multiplyScalar(this.speed)); moved = true;
-         // Play walk sound
-    this.walkSound.play();
- }
-        if (this.keys["s"]) { this.player.position.add(forward.clone().multiplyScalar(-this.speed)); moved = true; 
-        // Play walk sound
-    this.walkSound.play()
-}
-        if (this.keys["a"]) { this.player.position.add(right.clone().multiplyScalar(-this.speed)); moved = true; 
-        // Play walk sound
-    this.walkSound.play()
-}
-        if (this.keys["d"]) { this.player.position.add(right.clone().multiplyScalar(this.speed)); moved = true; 
-        // Play walk sound
-    this.walkSound.play()
-}
+        if (this.keys["w"]) { this.player.position.add(forward.clone().multiplyScalar(this.speed)); moved = true; this.walkSound.play(); }
+        if (this.keys["s"]) { this.player.position.add(forward.clone().multiplyScalar(-this.speed)); moved = true; this.walkSound.play() }
+        if (this.keys["a"]) { this.player.position.add(right.clone().multiplyScalar(-this.speed)); moved = true; this.walkSound.play() }
+        if (this.keys["d"]) { this.player.position.add(right.clone().multiplyScalar(this.speed)); moved = true; this.walkSound.play() }
 
-        // Horizontal collisions
-        this.updatePlayerHitbox(); // ✅ use custom shorter hitbox
+        this.updatePlayerHitbox(); 
         this.obstacles.forEach((obs, i) => this.obstacleBoxes[i].setFromObject(obs));
         if (this.obstacleBoxes.some(box => this.playerBox.intersectsBox(box))) {
             this.player.position.copy(oldPosition);
         }
 
-        // Jumping
         if (this.keys[" "] && !this.isJumping) {
             this.velocity_y = this.jumpStrength;
             this.isJumping = true;
-            
-                 // Play jump sound
-    this.jumpSound.currentTime = 0; // reset if already playing
-    this.jumpSound.play();
+            this.jumpSound.currentTime = 0; 
+            this.jumpSound.play();
         }
 
         this.player.position.y += this.velocity_y;
         this.velocity_y += this.gravity;
 
-        this.updatePlayerHitbox(); // ✅ update hitbox after vertical movement
+        this.updatePlayerHitbox(); 
         this.obstacles.forEach((obs, i) => this.obstacleBoxes[i].setFromObject(obs));
 
-        // Landing on obstacles
         for (let i = 0; i < this.obstacles.length; i++) {
             let obs = this.obstacles[i];
             let box = this.obstacleBoxes[i];
@@ -875,30 +450,17 @@ inventoryImg.style.display = this.item === 1 ? "block" : "none";
             }
         }
 
-        // Floor
-        
-        
-// ===== Ground 3 Full Collision (X, Y, Z) =====
-this.ground3Box.setFromObject(this.ground3);
-
-// Horizontal block (X and Z)
-if (this.playerBox.intersectsBox(this.ground3Box)) {
-
-    // If falling onto it (top collision)
-    if (this.velocity_y <= 0 &&
-        this.player.position.y > this.ground3.position.y) {
-
-        const groundTop = this.ground3Box.max.y;
-
-        this.player.position.y = groundTop + 1.35; // player height offset
-        this.velocity_y = 0;
-        this.isJumping = false;
-
-    } else {
-        // Side collision (block X/Z)
-        this.player.position.copy(oldPosition);
-    }
-}
+        this.ground3Box.setFromObject(this.ground3);
+        if (this.playerBox.intersectsBox(this.ground3Box)) {
+            if (this.velocity_y <= 0 && this.player.position.y > this.ground3.position.y) {
+                const groundTop = this.ground3Box.max.y;
+                this.player.position.y = groundTop + 1.35; 
+                this.velocity_y = 0;
+                this.isJumping = false;
+            } else {
+                this.player.position.copy(oldPosition);
+            }
+        }
         
         const halfSize = 50;
         const onGroundArea =
@@ -913,7 +475,6 @@ if (this.playerBox.intersectsBox(this.ground3Box)) {
             this.velocity_y = 0;
         }
 
-        // Player rotation
         if (moved) {
             const velocity = new THREE.Vector3(0,0,0);
             if (this.keys["w"]) velocity.add(forward);
@@ -926,15 +487,17 @@ if (this.playerBox.intersectsBox(this.ground3Box)) {
             }
         }
 
-        // Camera rotation
         if (this.keys["e"]) this.cameraAngle -= this.rotationSpeed;
         if (this.keys["q"]) this.cameraAngle += this.rotationSpeed;
-        const camX = this.player.position.x + Math.sin(this.cameraAngle) * this.cameraDistance;
-        const camZ = this.player.position.z + Math.cos(this.cameraAngle) * this.cameraDistance;
-        this.camera.position.set(camX, this.player.position.y + this.cameraHeight, camZ);
+        
+        // --- UPDATED CAMERA POSITIONING TO USE MOUSE ANGLES ---
+        const camX = this.player.position.x + this.cameraDistance * Math.sin(this.cameraAngle) * Math.cos(this.cameraPitch);
+        const camY = this.player.position.y + this.cameraHeight + this.cameraDistance * Math.sin(this.cameraPitch);
+        const camZ = this.player.position.z + this.cameraDistance * Math.cos(this.cameraAngle) * Math.cos(this.cameraPitch);
+        
+        this.camera.position.set(camX, camY, camZ);
         this.camera.lookAt(this.player.position);
 
-        // Send position to Scaledrone
         if (this.drone) {
             this.drone.publish({
                 room: "observable-room",
@@ -947,46 +510,31 @@ if (this.playerBox.intersectsBox(this.ground3Box)) {
                 }
             });
         }
-            // ===== WALK SOUND LOGIC =====
-    if (moved && !this.walkSoundPlaying) {
-        this.walkSound.loop = true; // loop walking sound
-        this.walkSound.play();
-        this.walkSoundPlaying = true;
-    } else if (!moved && this.walkSoundPlaying) {
-        this.walkSound.pause();
-        this.walkSound.currentTime = 0; // reset so it starts fresh next time
-        this.walkSoundPlaying = false;
-    }
-    
-    
+        if (moved && !this.walkSoundPlaying) {
+            this.walkSound.loop = true; 
+            this.walkSound.play();
+            this.walkSoundPlaying = true;
+        } else if (!moved && this.walkSoundPlaying) {
+            this.walkSound.pause();
+            this.walkSound.currentTime = 0; 
+            this.walkSoundPlaying = false;
+        }
 
-const fallLimit = -500; 
-if (this.player.position.y < fallLimit) {
-    // Reset player to spawn
-    this.player.position.set(0, 5, 0); 
-    this.velocity_y = 0;
-    this.isJumping = false;
-
-
-    this.item = 0;
-    const inventoryImg = document.getElementById("inventoryItem");
-    inventoryImg.style.display = "none";
-
-    console.log("You fell too far and died! Respawning...");
-}
-    
-    
-    
-    
-    
-    
+        const fallLimit = -500; 
+        if (this.player.position.y < fallLimit) {
+            this.player.position.set(0, 5, 0); 
+            this.velocity_y = 0;
+            this.isJumping = false;
+            this.item = 0;
+            const inventoryImg = document.getElementById("inventoryItem");
+            inventoryImg.style.display = "none";
+        }
     }
 
     animate() {
         requestAnimationFrame(() => this.animate());
         this.updateMovement();
         this.renderer.render(this.scene, this.camera);
-
     }
 
     addResizeListener() {
@@ -996,6 +544,7 @@ if (this.player.position.y < fallLimit) {
             this.renderer.setSize(window.innerWidth, window.innerHeight);
         });
     }
+
 }
 
 new MultiplayerEngine();
@@ -1022,15 +571,11 @@ new MultiplayerEngine();
         flex-wrap: nowrap;       /* keep in one row */
      ">
     <img id="inventoryItem" 
-         src="https://github.com/Maideo-Studio/textures/blob/main/00aed48c-afec-47c5-ba3b-c3f107e4298a%20(1).png?raw=true" 
+         src="https://raw.githubusercontent.com/Maideo-Studio/textures/a9b1d4f76d7ec91a6f76835a789a55d61fe9392f/00aed48c-afec-47c5-ba3b-c3f107e4298a%20(1).png" 
          style="width: 80px; max-width: 80px; display: none;">
 </div>
 
-
-         
 <img id="bottomImage" src="https://github.com/Maideo-Studio/textures/blob/main/output-onlinepngtools%20(3).png?raw=true">
 
- 
 </body>
-
 </html>
