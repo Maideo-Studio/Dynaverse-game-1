@@ -209,6 +209,120 @@ class MultiplayerEngine {
         this.eigthBox.position.set(-18, 1.45, -13);
         this.scene.add(this.eigthBox);
 
+
+
+      const boxGeo50 = new THREE.BoxGeometry(10, 6, 0.1); 
+        const texture50 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/db1426fa-5daa-4139-846b-7653a9e1792d.png");
+        const boxMat50 = new THREE.MeshStandardMaterial({ map: texture50, roughness: 1, side: THREE.DoubleSide });
+        this.fiftyBox = new THREE.Mesh(boxGeo50, boxMat50);
+        this.fiftyBox.position.set(0, 1.9, 49.9);
+        this.scene.add(this.fiftyBox);
+
+
+
+
+
+
+
+
+
+
+
+
+
+//car
+
+
+
+
+        const boxGeo9 = new THREE.CylinderGeometry(1, 1, 4); 
+        const texture9 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(8)%20(1).png");
+        const boxMat9 = new THREE.MeshStandardMaterial({ map: texture9, roughness: 1, side: THREE.DoubleSide });
+        this.ninthBox = new THREE.Mesh(boxGeo9, boxMat9);
+        this.ninthBox.position.set(-35, 0, 5);
+                this.ninthBox.rotation.set(1.56, 0, 0);
+        this.scene.add(this.ninthBox);
+ 
+
+
+        const boxGeo10 = new THREE.BoxGeometry(10, 1, 5); 
+        const texture10 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/download%20(38)%20(1).png");
+        const boxMat10 = new THREE.MeshStandardMaterial({ map: texture10, roughness: 1, side: THREE.DoubleSide });
+        this.tenthBox = new THREE.Mesh(boxGeo10, boxMat10);
+        this.tenthBox.position.set(-32, 0, 9.5);
+        this.scene.add(this.tenthBox);
+
+
+
+    const boxGeo11 = new THREE.CylinderGeometry(1, 1, 4); 
+        const texture11 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(8)%20(1).png");
+        const boxMat11 = new THREE.MeshStandardMaterial({ map: texture11, roughness: 1, side: THREE.DoubleSide });
+        this.eleventhBox = new THREE.Mesh(boxGeo11, boxMat11);
+        this.eleventhBox.position.set(-29, 0, 5);
+                this.eleventhBox.rotation.set(1.56, 0, 0);
+        this.scene.add(this.eleventhBox);
+        
+            const boxGeo12 = new THREE.CylinderGeometry(1, 1, 4); 
+        const texture12 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(8)%20(1).png");
+        const boxMat12 = new THREE.MeshStandardMaterial({ map: texture12, roughness: 1, side: THREE.DoubleSide });
+        this.twelvethBox = new THREE.Mesh(boxGeo12, boxMat12);
+        this.twelvethBox.position.set(-29, 0, 14);
+                this.twelvethBox.rotation.set(1.56, 0, 0);
+        this.scene.add(this.twelvethBox);
+        
+                   const boxGeo13 = new THREE.CylinderGeometry(1, 1, 4); 
+        const texture13 = loader.load("https://raw.githubusercontent.com/Maideo-Studio/textures/refs/heads/main/image%20(8)%20(1).png");
+        const boxMat13 = new THREE.MeshStandardMaterial({ map: texture13, roughness: 1, side: THREE.DoubleSide });
+        this.thirteenthBox = new THREE.Mesh(boxGeo13, boxMat13);
+        this.thirteenthBox.position.set(-35, 0, 14);
+                this.thirteenthBox.rotation.set(1.56, 0, 0);
+        this.scene.add(this.thirteenthBox);
+
+
+
+
+
+
+// Inside initObjects()
+this.car = new THREE.Group();
+
+// Add your existing car boxes to this group instead of the scene
+this.car.add(this.ninthBox);
+this.car.add(this.tenthBox);
+this.car.add(this.eleventhBox);
+this.car.add(this.twelvethBox);
+this.car.add(this.thirteenthBox);
+
+
+this.driving = false;
+this.carSpeed = 0;
+this.maxCarSpeed = 0.6;
+this.carAcceleration = 0.02;
+this.carFriction = 0.01;
+this.carTurnSpeed = 0.03;
+
+
+
+
+
+
+this.scene.add(this.car);
+
+
+// Initialize the car's bounding box
+this.carBox = new THREE.Box3();
+
+
+
+
+
+
+
+
+
+
+
+
         this.player = new THREE.Group();
         this.player.position.y = 0.5;
         this.scene.add(this.player);
@@ -404,6 +518,66 @@ if (this.item == 1) {
             }
 }
 
+// Press F to enter / exit car
+if (this.keys["f"]) {
+    this.driving = !this.driving;
+     this.cameraAngle += 3;
+    this.keys["f"] = false; // prevent spam toggle
+}
+
+
+
+
+
+
+
+if (this.driving) {
+
+this.cameraDistance = 0.1; // Much closer when driving
+            this.cameraHeight = 2;   // Lower when driving
+    // ACCELERATION
+    if (this.keys["w"]) this.carSpeed += this.carAcceleration;
+    if (this.keys["s"]) this.carSpeed -= this.carAcceleration;
+
+    this.carSpeed = Math.max(-this.maxCarSpeed, Math.min(this.maxCarSpeed, this.carSpeed));
+
+    if (!this.keys["w"] && !this.keys["s"]) {
+        if (this.carSpeed > 0) this.carSpeed -= this.carFriction;
+        if (this.carSpeed < 0) this.carSpeed += this.carFriction;
+    }
+
+    // TURNING
+    if (this.keys["a"]) this.car.position.z += 0.1;
+    if (this.keys["d"]) this.car.position.z -= 0.1;
+
+    // MOVE
+    const forward = new THREE.Vector3(-1, 0, 0);
+    forward.applyQuaternion(this.car.quaternion);
+    this.car.position.add(forward.multiplyScalar(this.carSpeed));
+
+    // Put player inside car
+   
+    this.player.position.copy(this.car.position);
+   this.player.position.y += 2;
+       this.player.position.x += -35;
+              this.player.position.z += 10;
+    // 🚗 CAMERA FOLLOWS CAR
+          
+    const camX = this.player.position.x + this.cameraDistance * Math.sin(this.cameraAngle) * Math.cos(this.cameraPitch);
+    const camY = this.player.position.y + this.cameraHeight + this.cameraDistance * Math.sin(this.cameraPitch);
+    const camZ = this.player.position.z + this.cameraDistance * Math.cos(this.cameraAngle) * Math.cos(this.cameraPitch);
+    
+    this.camera.position.set(camX-  -40, camY+20, camZ+20);
+
+    this.camera.lookAt(this.player.position);
+
+    return;
+}
+
+
+
+
+
         const forward = new THREE.Vector3();
         this.camera.getWorldDirection(forward);
         forward.y = 0;
@@ -529,6 +703,13 @@ if (this.item == 1) {
             const inventoryImg = document.getElementById("inventoryItem");
             inventoryImg.style.display = "none";
         }
+        
+
+        
+        
+        
+        
+        
     }
 
     animate() {
