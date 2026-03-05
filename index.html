@@ -286,7 +286,24 @@ class MultiplayerEngine {
 // Inside initObjects()
 this.car = new THREE.Group();
 
-// Add your existing car boxes to this group instead of the scene
+
+this.car.position.set(-32, 0, 10); // where the car is in the world
+
+// wheel 1
+this.ninthBox.position.set(-3, 0, -4.5);
+
+// body
+this.tenthBox.position.set(0, 0, 0);
+
+// wheel 2
+this.eleventhBox.position.set(3, 0, -4.5);
+
+// wheel 3
+this.twelvethBox.position.set(3, 0, 4.5);
+
+// wheel 4
+this.thirteenthBox.position.set(-3, 0, 4.5);
+
 this.car.add(this.ninthBox);
 this.car.add(this.tenthBox);
 this.car.add(this.eleventhBox);
@@ -311,7 +328,6 @@ this.scene.add(this.car);
 
 // Initialize the car's bounding box
 this.carBox = new THREE.Box3();
-
 
 
 
@@ -523,6 +539,10 @@ if (this.keys["f"]) {
     this.driving = !this.driving;
      this.cameraAngle += 3;
     this.keys["f"] = false; // prevent spam toggle
+           this.cameraAngle = 0;
+        this.cameraPitch = 0; // Added for vertical look
+        this.cameraDistance = 8;
+        this.cameraHeight = 4;
 }
 
 
@@ -547,8 +567,11 @@ this.cameraDistance = 0.1; // Much closer when driving
     }
 
     // TURNING
-    if (this.keys["a"]) this.car.position.z += 0.1;
-    if (this.keys["d"]) this.car.position.z -= 0.1;
+    if (this.keys["a"])        this.car.rotation.y += 0.01 ;
+    
+    
+    
+    if (this.keys["d"]) this.car.rotation.y -= 0.01;
 
     // MOVE
     const forward = new THREE.Vector3(-1, 0, 0);
@@ -557,17 +580,19 @@ this.cameraDistance = 0.1; // Much closer when driving
 
     // Put player inside car
    
-    this.player.position.copy(this.car.position);
-   this.player.position.y += 2;
-       this.player.position.x += -35;
-              this.player.position.z += 10;
-    // 🚗 CAMERA FOLLOWS CAR
+this.player.position.copy(this.car.position);
+      this.player.position.y += 2;
+
+
+
+
+
           
     const camX = this.player.position.x + this.cameraDistance * Math.sin(this.cameraAngle) * Math.cos(this.cameraPitch);
     const camY = this.player.position.y + this.cameraHeight + this.cameraDistance * Math.sin(this.cameraPitch);
     const camZ = this.player.position.z + this.cameraDistance * Math.cos(this.cameraAngle) * Math.cos(this.cameraPitch);
     
-    this.camera.position.set(camX-  -40, camY+20, camZ+20);
+this.camera.position.set(camX-  -40, camY+20, camZ+20);
 
     this.camera.lookAt(this.player.position);
 
